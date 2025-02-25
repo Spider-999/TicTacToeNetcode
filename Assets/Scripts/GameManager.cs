@@ -3,6 +3,8 @@ using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.EventSystems;
 using NUnit.Framework;
+using UnityEditor.U2D.Aseprite;
+using UnityEngine.UIElements;
 
 public enum PlayerType
 {
@@ -17,6 +19,7 @@ public class GameManager : NetworkBehaviour
     private PlayerType _playerType;
     private NetworkVariable<PlayerType> _currentPlayer = new NetworkVariable<PlayerType>(PlayerType.None);
     private NetworkVariable<PlayerType> _hostPlayerType = new NetworkVariable<PlayerType>(PlayerType.None);
+    [SerializeField] private GridManager _gridManager;
 
     #region Events
     public event EventHandler<OnClickedOnGridTileEventArgs> OnClickedOnGridTile;
@@ -37,11 +40,10 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void ClickedOnGridTileRpc(Vector2 position, PlayerType playerType)
     {
-        if(_currentPlayer.Value != playerType)
-        {
-            Debug.Log("It's not your turn.");
+        if (!ClickedOnGridChecks(position, playerType))
             return;
-        }
+
+        ShowGridManagerPlayerTypes();
 
         OnClickedOnGridTile?.Invoke(this, new OnClickedOnGridTileEventArgs(position, playerType));
         SwitchCurrentPlayerType();
@@ -78,6 +80,44 @@ public class GameManager : NetworkBehaviour
     public PlayerType CurrentPlayer
     {
         get => _currentPlayer.Value;
+    }
+
+    /// <summary>
+    /// Method just for debugging purposes.
+    /// </summary>
+    private void ShowGridManagerPlayerTypes()
+    {
+        foreach (var tile in _gridManager.Tiles)
+        {
+            Debug.Log($"Tile: {tile.Key} - PlayerType: {tile.Value.PlayerType} & {tile.Value}");
+        }
+    }
+
+    private bool ClickedOnGridChecks(Vector2 position, PlayerType playerType)
+    {
+        if (_currentPlayer.Value != playerType)
+        {
+            Debug.Log("It's not your turn.");
+            return false;
+        }
+
+        if (_gridManager.Tiles[position].PlayerType != PlayerType.None)
+        {
+            Debug.Log("Tile is already occupied.");
+            return false;
+        }
+
+        if (_gridManager.Tiles.ContainsKey(position))
+        {
+            _gridManager.Tiles[position].PlayerType = playerType;
+        }
+        else
+        {
+            Debug.Log("Tile not found.");
+            return false;
+        }
+
+        return true;
     }
 
     private void SetPlayerTypes()

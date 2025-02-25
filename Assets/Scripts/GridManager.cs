@@ -10,7 +10,13 @@ public class GridManager : MonoBehaviour
     [SerializeField] private Tile _tilePrefab;
     [SerializeField] private Transform _cameraTransform;
     [SerializeField] private Transform _backgroundTransform;
-    private Dictionary<Vector2Int, Tile> _tiles;
+    private Dictionary<Vector2, Tile> _tiles;
+
+    public Dictionary<Vector2, Tile> Tiles
+    {
+        get => _tiles;
+        set => _tiles = value;
+    }
 
     private void Start()
     {
@@ -33,7 +39,7 @@ public class GridManager : MonoBehaviour
     private void GenerateGrid()
     {
         // Instantiate the dictionary that holds all of the tiles
-        _tiles = new Dictionary<Vector2Int, Tile>();
+        _tiles = new Dictionary<Vector2, Tile>();
 
         // Create the grid
         for (int x = 0; x < _width; x++)
@@ -51,7 +57,7 @@ public class GridManager : MonoBehaviour
                 tile.SetColor(isOffset);
 
                 // Add the tile to the dictionary
-                _tiles.Add(new Vector2Int(x, y), tile);
+                _tiles.Add(new Vector2(x * _tileSize, y * _tileSize), tile);
             }
         }
 

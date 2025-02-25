@@ -6,6 +6,13 @@ public class Tile : MonoBehaviour
     [SerializeField] private Color _offsetColor;
     [SerializeField] private SpriteRenderer _spriteRenderer;
     [SerializeField] private GameObject _tileHighlight;
+    [SerializeField] private PlayerType _playerType;
+
+    public PlayerType PlayerType
+    {
+        get => _playerType;
+        set => _playerType = value;
+    }
 
     public void SetColor(bool isOffset)
     {
