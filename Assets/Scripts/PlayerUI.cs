@@ -11,6 +11,7 @@ public class PlayerUI : MonoBehaviour
 
     private void Start()
     {
+        _playerIndicatorGameObject.SetActive(false);
         GameManager.Instance.OnCurrentPlayerChanged += GameManager_OnCurrentPlayerChanged;
         GameManager.Instance.OnClientConnected += GameManager_OnClientConnected;
     }
@@ -58,5 +59,6 @@ public class PlayerUI : MonoBehaviour
         float x = _playerIndicatorGameObject.transform.position.x;
         float y = sign.transform.position.y;
         _playerIndicatorGameObject.transform.position = new Vector3(x, y, 0f);
+        _playerIndicatorGameObject.SetActive(true);
     }
 }

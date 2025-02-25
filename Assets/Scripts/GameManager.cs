@@ -106,8 +106,9 @@ public class GameManager : NetworkBehaviour
         if (IsHost)
         {
             _currentPlayer.Value = PlayerType.Cross;
-            NetworkManager.OnClientConnectedCallback += NetworkManager_OnClientConnected;
         }
+
+        NetworkManager.OnClientConnectedCallback += NetworkManager_OnClientConnected;
 
         // Attach a listener to the current player network variable.
         // Modifies the variable both on the server and the client.
@@ -118,9 +119,8 @@ public class GameManager : NetworkBehaviour
     }
 
     private void NetworkManager_OnClientConnected(ulong obj)
-    {
-        if(NetworkManager.Singleton.ConnectedClientsList.Count == 2)
-            OnClientConnected?.Invoke(this, EventArgs.Empty);
+    { 
+        OnClientConnected?.Invoke(this, EventArgs.Empty);
     }
 
     private void SwitchCurrentPlayerType()
