@@ -8,12 +8,20 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private GameObject _circleGameObject;
     [SerializeField] private GameObject _arrowGameObject;
     [SerializeField] private GameObject _playerIndicatorGameObject;
+    [SerializeField] private GameObject _youWonGameObject;
+    [SerializeField] private GameObject _youLoseGameObject;
 
     private void Start()
     {
         _playerIndicatorGameObject.SetActive(false);
         GameManager.Instance.OnCurrentPlayerChanged += GameManager_OnCurrentPlayerChanged;
         GameManager.Instance.OnClientConnected += GameManager_OnClientConnected;
+        GameManager.Instance.OnPlayerTypeWon += GameManager_OnPlayerTypeWon;
+    }
+
+    private void GameManager_OnPlayerTypeWon(object sender, GameManager.OnPlayerTypeWonEventArgs e)
+    {
+        SetPlayerWonText(e);
     }
 
     private void GameManager_OnClientConnected(object sender, EventArgs e)
@@ -60,5 +68,23 @@ public class PlayerUI : MonoBehaviour
         float y = sign.transform.position.y;
         _playerIndicatorGameObject.transform.position = new Vector3(x, y, 0f);
         _playerIndicatorGameObject.SetActive(true);
+    }
+
+    private void SetPlayerWonText(GameManager.OnPlayerTypeWonEventArgs e)
+    {
+        if (GameManager.Instance.CurrentPlayer == PlayerType.Cross)
+        {
+            if (e.PlayerTypeWinner == PlayerType.Cross)
+                _youWonGameObject.SetActive(true);
+            else
+                _youLoseGameObject.SetActive(true);
+        }
+        else if(GameManager.Instance.CurrentPlayer == PlayerType.Circle)
+        {
+            if (e.PlayerTypeWinner == PlayerType.Circle)
+                _youWonGameObject.SetActive(true);
+            else
+                _youLoseGameObject.SetActive(true);
+        }
     }
 }

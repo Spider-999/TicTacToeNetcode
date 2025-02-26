@@ -19,12 +19,24 @@ public class GameManager : NetworkBehaviour
     private PlayerType _playerType;
     private NetworkVariable<PlayerType> _currentPlayer = new NetworkVariable<PlayerType>(PlayerType.None);
     private NetworkVariable<PlayerType> _hostPlayerType = new NetworkVariable<PlayerType>(PlayerType.None);
+    private NetworkVariable<PlayerType> _playerTypeWinner = new NetworkVariable<PlayerType>(PlayerType.None);
     [SerializeField] private GridManager _gridManager;
+    private bool _gameOver = false;
 
     #region Events
     public event EventHandler<OnClickedOnGridTileEventArgs> OnClickedOnGridTile;
     public event EventHandler OnClientConnected;
     public event EventHandler OnCurrentPlayerChanged;
+    public event EventHandler<OnPlayerTypeWonEventArgs> OnPlayerTypeWon;
+
+    public class OnPlayerTypeWonEventArgs : EventArgs
+    {
+        public PlayerType PlayerTypeWinner { get; private set; }
+        public OnPlayerTypeWonEventArgs(PlayerType playerTypeWinner)
+        {
+            PlayerTypeWinner = playerTypeWinner;
+        }
+    }
 
     public class OnClickedOnGridTileEventArgs : EventArgs
     {
@@ -40,6 +52,9 @@ public class GameManager : NetworkBehaviour
     [Rpc(SendTo.Server)]
     public void ClickedOnGridTileRpc(Vector2 position, PlayerType playerType)
     {
+        if (_gameOver)
+            return;
+
         if (!ClickedOnGridChecks(position, playerType))
             return;
 
@@ -48,6 +63,12 @@ public class GameManager : NetworkBehaviour
 
         OnClickedOnGridTile?.Invoke(this, new OnClickedOnGridTileEventArgs(position, playerType));
         SwitchCurrentPlayerType();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    public void OnPlayerTypeWonRpc()
+    {
+        OnPlayerTypeWon?.Invoke(this, new OnPlayerTypeWonEventArgs(_playerTypeWinner.Value));
     }
     #endregion
 
@@ -183,11 +204,15 @@ public class GameManager : NetworkBehaviour
         if(CheckLines(playerType) || CheckDiagonals(playerType))
         {
             Debug.Log(playerType + " won!");
+            _playerTypeWinner.Value = playerType;
+            _gameOver = true;
+            OnPlayerTypeWonRpc();
         }
 
         if(CheckTie())
         {
             Debug.Log("It's a tie!");
+            _gameOver = true;
         }
     }
 
@@ -198,7 +223,6 @@ public class GameManager : NetworkBehaviour
             // Set the host to a random player type.
             _playerType = GetRandomEnumValue<PlayerType>();
             _hostPlayerType.Value = _playerType;
-            Debug.Log(_playerType);
         }
         else if(IsClient && _playerType == PlayerType.None)
         { 
