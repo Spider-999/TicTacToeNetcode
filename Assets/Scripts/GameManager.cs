@@ -151,14 +151,31 @@ public class GameManager : NetworkBehaviour
 
     private bool CheckDiagonals(PlayerType playerType)
     {
-            Vector2 position = new Vector2(_gridManager.TileSize, _gridManager.TileSize);
-            // main diagonal
-            if (_gridManager.Tiles[position * 0].PlayerType == playerType &&
-                _gridManager.Tiles[position].PlayerType == playerType &&
-                _gridManager.Tiles[position * 2].PlayerType == playerType)
-                return true;
+        Vector2 position = new Vector2(_gridManager.TileSize, _gridManager.TileSize);
+        // Secondary diagonal
+        if (_gridManager.Tiles[position * 0].PlayerType == playerType &&
+            _gridManager.Tiles[position].PlayerType == playerType &&
+            _gridManager.Tiles[position * 2].PlayerType == playerType)
+            return true;
+
+        Vector2 position1 = new Vector2(0, _gridManager.TileSize * 2);
+        Vector2 position2 = new Vector2(_gridManager.TileSize, _gridManager.TileSize);
+        Vector2 position3 = new Vector2(_gridManager.TileSize * 2, 0);
+        if (_gridManager.Tiles[position1].PlayerType == playerType &&
+           _gridManager.Tiles[position2].PlayerType == playerType &&
+           _gridManager.Tiles[position3].PlayerType == playerType)
+            return true;
 
         return false;
+    }
+
+    private bool CheckTie()
+    {
+        foreach (var tile in _gridManager.Tiles)
+            if (tile.Value.PlayerType == PlayerType.None)
+                return false;
+
+        return true;
     }
 
     private void ClickedOnGridCheckWin(PlayerType playerType)
@@ -166,6 +183,11 @@ public class GameManager : NetworkBehaviour
         if(CheckLines(playerType) || CheckDiagonals(playerType))
         {
             Debug.Log(playerType + " won!");
+        }
+
+        if(CheckTie())
+        {
+            Debug.Log("It's a tie!");
         }
     }
 
