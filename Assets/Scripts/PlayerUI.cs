@@ -16,16 +16,24 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private GameObject _gridManager;
     [SerializeField] private GameObject _gameVisualManager;
 
+    private void Awake()
+    {
+        _playAgainGameObject.onClick.AddListener(() => { GameManager.Instance.OnPlayAgainClickedRpc(); });
+    }
+
     private void Start()
     {
-        _playAgainGameObject.onClick.AddListener(() => { GameManager.Instance.OnPlayAgainClicked(); });
-        _playerIndicatorGameObject.SetActive(false);
         GameManager.Instance.OnCurrentPlayerChanged += GameManager_OnCurrentPlayerChanged;
         GameManager.Instance.OnClientConnected += GameManager_OnClientConnected;
         GameManager.Instance.OnPlayerTypeWon += GameManager_OnPlayerTypeWon;
+        GameManager.Instance.OnPlayAgainClicked += GameManager_OnPlayAgainClicked;
     }
 
     #region Event methods
+    private void GameManager_OnPlayAgainClicked(object sender, EventArgs e)
+    {
+        HideUI();
+    }
 
     private void GameManager_OnPlayerTypeWon(object sender, GameManager.OnPlayerTypeWonEventArgs e)
     {
@@ -99,6 +107,14 @@ public class PlayerUI : MonoBehaviour
                 _youLoseGameObject.SetActive(true);
             _playAgainGameObject.gameObject.SetActive(true);
         }
+    }
+
+    private void HideUI()
+    {
+        _playAgainGameObject.gameObject.SetActive(false);
+        _youWonGameObject.SetActive(false);
+        _youLoseGameObject.SetActive(false);
+
     }
     #endregion
 }

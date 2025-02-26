@@ -28,6 +28,7 @@ public class GameManager : NetworkBehaviour
     public event EventHandler OnClientConnected;
     public event EventHandler OnCurrentPlayerChanged;
     public event EventHandler<OnPlayerTypeWonEventArgs> OnPlayerTypeWon;
+    public event EventHandler OnPlayAgainClicked;
 
     public class OnPlayerTypeWonEventArgs : EventArgs
     {
@@ -281,9 +282,28 @@ public class GameManager : NetworkBehaviour
         return (T)values.GetValue(UnityEngine.Random.Range(1, values.Length));
     }
 
-    internal void OnPlayAgainClicked()
+    [Rpc(SendTo.Server)]
+    internal void OnPlayAgainClickedRpc()
     {
-        throw new NotImplementedException();
+        ResetGridPlayerTypes();
+        // Reset current player to cross.
+        _currentPlayer.Value = PlayerType.Cross;
+        _gameOver = false;
+        TriggerOnPlayAgainClickedRpc();
+    }
+
+    [Rpc(SendTo.ClientsAndHost)]
+    private void TriggerOnPlayAgainClickedRpc()
+    {
+        OnPlayAgainClicked?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void ResetGridPlayerTypes()
+    {
+       foreach(var tile in _gridManager.Tiles)
+        {
+            tile.Value.PlayerType = PlayerType.None;
+        }
     }
     #endregion
 }
