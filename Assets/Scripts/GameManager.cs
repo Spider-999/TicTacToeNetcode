@@ -280,5 +280,10 @@ public class GameManager : NetworkBehaviour
         // Get a random value from the enum excluding the first value (None).
         return (T)values.GetValue(UnityEngine.Random.Range(1, values.Length));
     }
+
+    internal void OnPlayAgainClicked()
+    {
+        throw new NotImplementedException();
+    }
     #endregion
 }

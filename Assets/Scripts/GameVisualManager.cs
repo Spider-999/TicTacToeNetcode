@@ -51,6 +51,7 @@ public class GameVisualManager : NetworkBehaviour
         GameObject spawnedObject = Instantiate(prefab, position, Quaternion.identity);
         // Spawn the cross prefab on the network and destroy it when the client disconnects
         spawnedObject.GetComponent<NetworkObject>().Spawn(true);
+        spawnedObject.transform.SetParent(transform);
     }
     #endregion
 }

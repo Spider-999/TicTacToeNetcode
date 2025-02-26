@@ -1,6 +1,8 @@
 using NUnit.Framework.Constraints;
 using System;
+using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerUI : MonoBehaviour
 {
@@ -10,14 +12,20 @@ public class PlayerUI : MonoBehaviour
     [SerializeField] private GameObject _playerIndicatorGameObject;
     [SerializeField] private GameObject _youWonGameObject;
     [SerializeField] private GameObject _youLoseGameObject;
+    [SerializeField] private Button _playAgainGameObject;
+    [SerializeField] private GameObject _gridManager;
+    [SerializeField] private GameObject _gameVisualManager;
 
     private void Start()
     {
+        _playAgainGameObject.onClick.AddListener(() => { GameManager.Instance.OnPlayAgainClicked(); });
         _playerIndicatorGameObject.SetActive(false);
         GameManager.Instance.OnCurrentPlayerChanged += GameManager_OnCurrentPlayerChanged;
         GameManager.Instance.OnClientConnected += GameManager_OnClientConnected;
         GameManager.Instance.OnPlayerTypeWon += GameManager_OnPlayerTypeWon;
     }
+
+    #region Event methods
 
     private void GameManager_OnPlayerTypeWon(object sender, GameManager.OnPlayerTypeWonEventArgs e)
     {
@@ -33,7 +41,10 @@ public class PlayerUI : MonoBehaviour
     {
         SetArrowPosition();
     }
+    #endregion
 
+
+    #region Helper methods
     private void SetArrowPosition()
     {
         _playerIndicatorGameObject.SetActive(true);
@@ -78,6 +89,7 @@ public class PlayerUI : MonoBehaviour
                 _youWonGameObject.SetActive(true);
             else
                 _youLoseGameObject.SetActive(true);
+            _playAgainGameObject.gameObject.SetActive(true);
         }
         else if(GameManager.Instance.CurrentPlayer == PlayerType.Circle)
         {
@@ -85,6 +97,8 @@ public class PlayerUI : MonoBehaviour
                 _youWonGameObject.SetActive(true);
             else
                 _youLoseGameObject.SetActive(true);
+            _playAgainGameObject.gameObject.SetActive(true);
         }
     }
+    #endregion
 }
