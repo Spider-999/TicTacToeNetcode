@@ -43,7 +43,8 @@ public class GameManager : NetworkBehaviour
         if (!ClickedOnGridChecks(position, playerType))
             return;
 
-        ShowGridManagerPlayerTypes();
+        ClickedOnGridCheckWin(playerType);
+        //ShowGridManagerPlayerTypes();
 
         OnClickedOnGridTile?.Invoke(this, new OnClickedOnGridTileEventArgs(position, playerType));
         SwitchCurrentPlayerType();
@@ -118,6 +119,54 @@ public class GameManager : NetworkBehaviour
         }
 
         return true;
+    }
+
+    private bool CheckLines(PlayerType playerType)
+    {
+        for (int x = 0; x < 3; ++x)
+        {
+            Vector2 position1 = new Vector2(0, x * _gridManager.TileSize);
+            Vector2 position2 = new Vector2(_gridManager.TileSize, x * _gridManager.TileSize);
+            Vector2 position3 = new Vector2(_gridManager.TileSize * 2, x * _gridManager.TileSize);
+
+            // Check horizontal lines
+            if (_gridManager.Tiles[position1].PlayerType == playerType &&
+                _gridManager.Tiles[position2].PlayerType == playerType &&
+                _gridManager.Tiles[position3].PlayerType == playerType)
+                return true;
+
+
+            position1 = new Vector2(x * _gridManager.TileSize, 0);
+            position2 = new Vector2(x * _gridManager.TileSize, _gridManager.TileSize);
+            position3 = new Vector2(x * _gridManager.TileSize, _gridManager.TileSize * 2);
+
+            // Check vertical lines
+            if (_gridManager.Tiles[position1].PlayerType == playerType &&
+                _gridManager.Tiles[position2].PlayerType == playerType &&
+                _gridManager.Tiles[position3].PlayerType == playerType)
+                return true;
+        }
+        return false;
+    }
+
+    private bool CheckDiagonals(PlayerType playerType)
+    {
+            Vector2 position = new Vector2(_gridManager.TileSize, _gridManager.TileSize);
+            // main diagonal
+            if (_gridManager.Tiles[position * 0].PlayerType == playerType &&
+                _gridManager.Tiles[position].PlayerType == playerType &&
+                _gridManager.Tiles[position * 2].PlayerType == playerType)
+                return true;
+
+        return false;
+    }
+
+    private void ClickedOnGridCheckWin(PlayerType playerType)
+    {
+        if(CheckLines(playerType) || CheckDiagonals(playerType))
+        {
+            Debug.Log(playerType + " won!");
+        }
     }
 
     private void SetPlayerTypes()

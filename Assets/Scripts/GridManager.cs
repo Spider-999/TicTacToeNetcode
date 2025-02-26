@@ -18,6 +18,11 @@ public class GridManager : MonoBehaviour
         set => _tiles = value;
     }
 
+    public int TileSize
+    {
+        get => _tileSize;
+    }
+
     private void Start()
     {
         GenerateGrid();
